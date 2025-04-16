@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang='ko'>
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scaleable=no">
+    <link rel="stylesheet" href="./style.css" />
+    <title>ㅎㅇ</title>
+  </head>
+  <body>
+    <div id="container" align="center">
+      <img src='./nong.jpg'>
+      <h1>가챠 URL 추출기</h1>
+      <input type='file' id='dumpstate' onchange='fileChange(this)' accept='text/plain' class='file-input__input' />
+      <label class='file-input__label' for='dumpstate'><span>파일 업로드하기</span></label>
+      <p>상태: <span id='status'>파일이 선택되지 않았습니다.</span></p>
+    </div>
+  </body>
+<script>
+  function fileChange(form) {
+    const fileWrapper = document.querySelector('input#dumpstate');
+    const label = document.querySelector('label[for="dumpstate"]');
+    const status = document.querySelector('span#status');
+    const file = fileWrapper.files[0];
+
+    if (!file) {
+      status.innerText = '파일을 선택해주세요.';
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.addEventListener('load', (e) => {
+      label.classList.toggle('upload-disabled');
+      fileWrapper.disabled = false;
+      status.innerText = 'URL을 추출하는 중입니다..';
+
+      const body = e.target.result;
+
+      const urlRegex = /https:\/\/gs\.hoyoverse\.com.*?(hk4e_global#\/log|hkrpg_global)/g;
+      const matches = body.match(urlRegex);
+
+      if (!matches || matches.length === 0) {
+        status.innerText = '오류 - URL을 찾을 수 없습니다.';
+        return;
+      }
+
+      const foundUrl = matches[0];
+      status.innerText = 'URL을 찾았습니다.';
+      prompt('찾은 URL입니다. 선택해서 복사 후 사용하세요.', foundUrl);
+      window.location.reload();
+    });
+
+    reader.readAsText(file); 
+  }
+</script>
+</html>
